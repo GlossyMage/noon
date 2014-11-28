@@ -7,6 +7,8 @@
 
 struct dim_t dimensions;
 
+int *grid;
+
 void init_display(void)
 {
 	
@@ -16,9 +18,27 @@ void init_display(void)
 	
 	dimensions.x = 90;
 	dimensions.y = 22;
+
+	init_grid();
 }
 
-void refresh_display(const int grid[])
+void init_grid(void)
+{
+	int i;
+	grid = malloc(sizeof (int) * dimensions.x * dimensions.y);
+	
+	for (i = 0; i < dimensions.x * dimensions.y; i++) {
+		int x, y;
+		get_coords(i, &x, &y);
+		if (24 == x && 7 == y) {
+			grid[i] = 2;
+		} else {
+			grid[i] = 1;
+		}
+	}
+}
+
+void refresh_display(void)
 {
 	fprintf(stderr, "Entered refresh_display.\n");
 	int k = 0;
@@ -44,12 +64,14 @@ void refresh_display(const int grid[])
 	}
 }
 
+// Get coordinates corresponding to the given index.
 void get_coords(int index, int *x, int *y) 
 {
 	*y = index / dimensions.x;
 	*x = index % dimensions.x;
 }
 
+// Get index corresponding to the given coordinates.
 void get_index(int *index, int x, int y) 
 {
 	*index = y * dimensions.x + x;
