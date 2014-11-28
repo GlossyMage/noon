@@ -17,7 +17,9 @@ int main(int argc, char *argv[])
 	fprintf(stderr, "Dimensions: x=%d y=%d\n", d.x, d.y);
 
 	for (i = 0; i < d.x*d.y; i++) {
-		if ((d.x*12)+12 == i) {
+		int x, y;
+		get_coords(i, &x, &y);
+		if (24 == x && 7 == y) {
 			grid[i] = 2;
 		} else {
 			grid[i] = 1;
