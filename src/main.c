@@ -1,7 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <ao/ao.h>
-//#include <mpg123-0.h>
 #include "display.h"
 #include "player.h"
 
@@ -13,7 +11,6 @@
 int main(int argc, char *argv[])
 {
 	if (init_player("Yacchatta.mp3")) {
-		printf("Wut.\n");
 		return 0;
 	}
 //	init_display();
