@@ -67,7 +67,10 @@ int init_player(char *music)
 
 	/* Decode and play */
 	while (mpg123_read(mh, buffer, buffer_size, &done) == MPG123_OK) {
-		ao_play(dev, buffer, done);
+		if (!ao_play(dev, buffer, done)) {
+			printf("Error playing file.\n");
+			break;
+		}
 	}
 
 	/* Clean up */
