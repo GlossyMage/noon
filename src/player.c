@@ -1,6 +1,7 @@
 #ifndef PLAYER
 #define PLAYER
 #include "player.h"
+#include <errno.h>
 
 #define BITS 8
 
@@ -19,7 +20,6 @@ int init_player(char *music)
 	int channels, encoding;
 	long rate;
 
-	printf("Starting stuff.\n");
 	if (!music) {
 		printf("No filename supplied.\n");
 		return 1;
@@ -28,10 +28,15 @@ int init_player(char *music)
 	/* Init */
 	ao_initialize();
 	driver = ao_default_driver_id();
+	if (-1 == driver) {
+		printf("No valid driver found.\n");
+		return 1;
+	}
 	mpg123_init();
 	mh = mpg123_new(NULL, &err);
 	printf("ERR = %u\n", err);
 	buffer_size = mpg123_outblock(mh);
+	printf("Buffer size: %d\n", buffer_size);
 	buffer = (unsigned char*) malloc(buffer_size * sizeof(unsigned char));
 
 	/* Get encoding format of file */
@@ -45,10 +50,23 @@ int init_player(char *music)
 	format.byte_format = AO_FMT_NATIVE;
 	format.matrix = 0;
 	dev = ao_open_live(driver, &format, NULL);
+	if (!dev) {
+		if (errno == AO_ENODRIVER) {
+			printf("No driver corresponds to driver_id.\n");
+		} else if (errno == AO_ENOTLIVE) {
+			printf("This driver is not a live output device.\n");
+		} else if (errno == AO_EBADOPTION) {
+			printf("Option error.\n");
+		} else if (errno == AO_EOPENDEVICE) {
+			printf("Cannot open the device.\n");
+		} else if (errno == AO_EFAIL) {
+			printf("Some other error occurred.\n");
+		}
+		return 1;
+	}
 
 	/* Decode and play */
 	while (mpg123_read(mh, buffer, buffer_size, &done) == MPG123_OK) {
-		printf("Playing song.\n");
 		ao_play(dev, buffer, done);
 	}
 
